@@ -1,8 +1,12 @@
 package edu.buptsse.youchat
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import edu.buptsse.youchat.ui.theme.Gray3
 import edu.buptsse.youchat.ui.theme.Teal200
 import edu.buptsse.youchat.ui.theme.YouChatTheme
+import edu.buptsse.youchat.util.isReadAndWriteStoragePermission
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -33,6 +38,27 @@ class ChatActivity : ComponentActivity() {
         var msg = SnapshotStateList<Pair<Boolean, Message>>()
         var name = "伍昶旭"
         var i = 0
+    }
+
+    private lateinit var imageUri: Uri
+
+    private val requestPermission = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        if (it) {
+            Log.i("ok", "ok ok")
+        } else {
+            Toast.makeText(
+                this@ChatActivity, "申请权限失败", Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private val getImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            imageUri = uri
+            Log.e("image uri", uri.toString())
+        }
     }
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -48,6 +74,11 @@ class ChatActivity : ComponentActivity() {
                                 val scope = rememberCoroutineScope()
                                 IconTextButton(R.drawable.ic_baseline_image_24, "图片") {
                                     // on click
+                                    if (!isReadAndWriteStoragePermission()) {
+                                        requestPermission.launch(null)
+                                    } else {
+                                        getImage.launch("image/*")
+                                    }
                                     scope.launch { drawerState.close() }
                                 }
                                 IconTextButton(R.drawable.ic_baseline_insert_drive_file_24, "文件") {
