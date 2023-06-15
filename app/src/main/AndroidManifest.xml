@@ -26,6 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ChatActivity"/>
+        <activity android:name=".LoginActivity"/>
+        <activity android:name=".RegisterActivity"/>
     </application>
 
 </manifest>
