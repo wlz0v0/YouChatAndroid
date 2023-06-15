@@ -40,7 +40,7 @@ class ChatActivity : ComponentActivity() {
         var name = "伍昶旭"
         var i = 0
     }
-
+    
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
