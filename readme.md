@@ -4,11 +4,13 @@
 
 ### env：
 http://www.androiddevtools.cn/
+
 Android SDK 29
+
 JDK 11
 
 ### 功能：
 
 用户系统、文字聊天、文件传输、图片发送、语音通话
 
-指导教师：==**<u>孙艺</u>**==
+指导教师：**<u>孙艺</u>**
