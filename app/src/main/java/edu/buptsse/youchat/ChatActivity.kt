@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package edu.buptsse.youchat
 
 import android.net.Uri
@@ -139,14 +141,6 @@ class ChatActivity : ComponentActivity() {
                                     isSendButton = chatText.isNotEmpty()
                                 },
                                 modifier = Modifier.padding(5.dp, 5.dp, 100.dp, 5.dp).fillMaxWidth(),
-                                /*leadingIcon = { Icon(painterResource(R.drawable.ic_baseline_search_24), contentDescription = null) },
-                            trailingIcon = {
-                                Button(
-                                    onClick = { onClick() },
-                                    shape = RoundedCornerShape(50),
-                                    modifier = Modifier.padding(top = 3.dp, bottom = 3.dp, end = 2.dp).width(80.dp)
-                                ) { Text("搜索", fontSize = 15.sp, modifier = Modifier.align(Alignment.CenterVertically)) }
-                            },*/
                                 shape = RoundedCornerShape(50),
                                 colors = TextFieldDefaults.outlinedTextFieldColors(
                                     backgroundColor = MaterialTheme.colors.background,
