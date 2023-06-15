@@ -1,23 +1,17 @@
 package edu.buptsse.youchat
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -40,7 +34,7 @@ class ChatActivity : ComponentActivity() {
         var name = "伍昶旭"
         var i = 0
     }
-    
+
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +43,22 @@ class ChatActivity : ComponentActivity() {
                 val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
                 BottomDrawer(
                     drawerContent = {
-                        Column(Modifier.fillMaxWidth().height(200.dp)) {
-
+                        Box(Modifier.fillMaxWidth().height(100.dp)) {
+                            Row(Modifier.fillMaxWidth().align(Alignment.Center)) {
+                                val scope = rememberCoroutineScope()
+                                IconTextButton(R.drawable.ic_baseline_image_24, "图片") {
+                                    // on click
+                                    scope.launch { drawerState.close() }
+                                }
+                                IconTextButton(R.drawable.ic_baseline_insert_drive_file_24, "文件") {
+                                    // on click
+                                    scope.launch { drawerState.close() }
+                                }
+                                IconTextButton(R.drawable.ic_baseline_call_24, "语音") {
+                                    // on click
+                                    scope.launch { drawerState.close() }
+                                }
+                            }
                         }
                     },
                     drawerState = drawerState
@@ -179,5 +187,15 @@ fun MessageBox(isSend: Boolean, message: Message) {
                 fontSize = 22.sp
             )
         }
+    }
+}
+
+@Composable
+private fun RowScope.IconTextButton(id: Int, text: String, onClick: () -> Unit) {
+    Box(Modifier.weight(1.0f).height(70.dp)) {
+        OutlinedButton(onClick = { onClick() }, modifier = Modifier.align(Alignment.TopCenter)) {
+            Icon(painterResource(id), null, tint = Color.Black)
+        }
+        Text(text, fontSize = 17.sp, modifier = Modifier.align(Alignment.BottomCenter), fontWeight = FontWeight.Bold)
     }
 }
