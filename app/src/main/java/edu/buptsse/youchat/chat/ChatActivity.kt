@@ -1,14 +1,18 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
-package edu.buptsse.youchat
+package edu.buptsse.youchat.chat
 
+import android.Manifest
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,25 +32,44 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import edu.buptsse.youchat.Message
+import edu.buptsse.youchat.R
+import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.ui.theme.Gray3
 import edu.buptsse.youchat.ui.theme.Teal200
 import edu.buptsse.youchat.ui.theme.YouChatTheme
-import edu.buptsse.youchat.util.isReadAndWriteStoragePermission
+import edu.buptsse.youchat.util.hasMicrophonePermission
+import edu.buptsse.youchat.util.hasReadAndWriteStoragePermission
 import kotlinx.coroutines.launch
 import java.util.*
 
 class ChatActivity : ComponentActivity() {
     companion object {
         var msg = SnapshotStateList<Pair<Boolean, Message>>()
-        var name = "伍昶旭"
+        var friend = User("10002", "伍昶旭", "")
         var i = 0
     }
 
     private lateinit var imageUri: Uri
+    private lateinit var fileUri: Uri
 
-    private val requestPermission = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+    private val readPermission = Manifest.permission.READ_EXTERNAL_STORAGE
+    private val writePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
+    private val audioPermission = Manifest.permission.RECORD_AUDIO
+
+    private val requestPermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
     ) {
+        if (it[readPermission]!! && it[writePermission]!!) {
+            Log.i("ok", "ok ok")
+        } else {
+            Toast.makeText(
+                this@ChatActivity, "申请权限失败", Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
             Log.i("ok", "ok ok")
         } else {
@@ -63,6 +86,18 @@ class ChatActivity : ComponentActivity() {
         }
     }
 
+    private val getFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            fileUri = uri
+            Log.e("image uri", uri.toString())
+        }
+    }
+
+    private fun jumpFromChatToCall(friendId: String) {
+        startActivity(Intent(this, CallActivity::class.java))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +111,8 @@ class ChatActivity : ComponentActivity() {
                                 val scope = rememberCoroutineScope()
                                 IconTextButton(R.drawable.ic_baseline_image_24, "图片") {
                                     // on click
-                                    if (!isReadAndWriteStoragePermission()) {
-                                        requestPermission.launch(null)
+                                    if (!hasReadAndWriteStoragePermission()) {
+                                        requestPermissions.launch(arrayOf(readPermission, writePermission))
                                     } else {
                                         getImage.launch("image/*")
                                     }
@@ -85,16 +120,25 @@ class ChatActivity : ComponentActivity() {
                                 }
                                 IconTextButton(R.drawable.ic_baseline_insert_drive_file_24, "文件") {
                                     // on click
+                                    if (!hasReadAndWriteStoragePermission()) {
+                                        requestPermissions.launch(arrayOf(readPermission, writePermission))
+                                    } else {
+                                        getFile.launch("application/pdf")
+                                    }
                                     scope.launch { drawerState.close() }
                                 }
                                 IconTextButton(R.drawable.ic_baseline_call_24, "语音") {
                                     // on click
+                                    if (!hasMicrophonePermission()) {
+                                        requestPermission.launch(audioPermission)
+                                    } else {
+                                        jumpFromChatToCall(friend.id)
+                                    }
                                     scope.launch { drawerState.close() }
                                 }
                             }
                         }
-                    },
-                    drawerState = drawerState
+                    }, drawerState = drawerState
                 ) {
                     val chatTextFieldHeight = 60.dp
 
@@ -106,13 +150,12 @@ class ChatActivity : ComponentActivity() {
                             Card(Modifier.fillMaxWidth().background(Teal200)) {
                                 Box(Modifier.fillMaxWidth().background(Teal200)) {
                                     IconButton(
-                                        { finish() },
-                                        Modifier.align(Alignment.CenterStart).padding(start = 5.dp)
+                                        { finish() }, Modifier.align(Alignment.CenterStart).padding(start = 5.dp)
                                     ) {
                                         Icon(Icons.Default.ArrowBack, null, tint = Color.White)
                                     }
                                     Text(
-                                        name,
+                                        friend.username,
                                         Modifier.align(Alignment.Center),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 22.sp,
@@ -129,8 +172,7 @@ class ChatActivity : ComponentActivity() {
                         }
                         // 编辑框
                         Box(
-                            Modifier.fillMaxWidth().align(Alignment.BottomCenter)
-                                .height(chatTextFieldHeight)
+                            Modifier.fillMaxWidth().align(Alignment.BottomCenter).height(chatTextFieldHeight)
                         ) {
                             var chatText by remember { mutableStateOf("") }
                             var isSendButton by remember { mutableStateOf(false) }
@@ -157,8 +199,7 @@ class ChatActivity : ComponentActivity() {
                                         msg.add(Pair(i % 2 == 0, message))
                                         chatText = ""
                                         isSendButton = false
-                                    },
-                                    modifier = Modifier.padding(10.dp, 5.dp).align(Alignment.CenterEnd).width(80.dp),
+                                    }, modifier = Modifier.padding(10.dp, 5.dp).align(Alignment.CenterEnd).width(80.dp),
                                     // 是否能被点击
                                     enabled = true,
                                     // 来个圆角按钮
@@ -183,8 +224,7 @@ class ChatActivity : ComponentActivity() {
                                         .clip(CircleShape),
                                     shape = CircleShape,
                                     colors = ButtonDefaults.outlinedButtonColors(
-                                        backgroundColor = Color.White,
-                                        contentColor = Color.Black
+                                        backgroundColor = Color.White, contentColor = Color.Black
                                     )
                                 ) {
                                     Icon(Icons.Default.Add, null)

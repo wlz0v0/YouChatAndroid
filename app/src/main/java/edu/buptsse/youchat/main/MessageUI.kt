@@ -24,7 +24,6 @@ import edu.buptsse.youchat.Message
 import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.ui.theme.Gray5
 import edu.buptsse.youchat.ui.theme.Teal200
-import edu.buptsse.youxuancheng.network.getUser
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,6 +35,14 @@ val msgMap = mutableStateMapOf(
         Pair(
             false, Message(
                 "武连增", "伍昶旭",
+                "This is a test".toByteArray(), Date(), Message.Type.TEXT
+            )
+        )
+    ),
+    "10003" to mutableStateListOf<Pair<Boolean, Message>>(
+        Pair(
+            false, Message(
+                "武连增", "董浩楠",
                 "This is a test".toByteArray(), Date(), Message.Type.TEXT
             )
         )
@@ -57,7 +64,7 @@ fun MessageUI(activity: MainActivity) {
         // TODO: bottom padding
         LazyColumn(Modifier.fillMaxWidth().padding(bottom = 0.dp)) {
             msgMap.entries.forEach {
-                item { MessageListView(getUser(it.key), activity) }
+                item { MessageListView(getUserById(it.key), activity) }
             }
         }
     }

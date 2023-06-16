@@ -5,14 +5,20 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 
-fun Context.isReadAndWriteStoragePermission(): Boolean {
+private val hasPermission = PackageManager.PERMISSION_GRANTED
+
+fun Context.hasReadAndWriteStoragePermission(): Boolean {
     val readPermission = ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.READ_EXTERNAL_STORAGE
-    ) != PackageManager.PERMISSION_GRANTED
+    ) != hasPermission
     val writePermission = ActivityCompat.checkSelfPermission(
         this,
         Manifest.permission.READ_EXTERNAL_STORAGE
-    ) != PackageManager.PERMISSION_GRANTED
+    ) != hasPermission
     return (readPermission && writePermission)
+}
+
+fun Context.hasMicrophonePermission(): Boolean {
+    return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != hasPermission
 }

@@ -7,16 +7,18 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import edu.buptsse.youchat.ChatActivity
 import edu.buptsse.youchat.LoginActivity
+import edu.buptsse.youchat.chat.ChatActivity
 import edu.buptsse.youchat.ui.theme.YouChatTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,6 +29,7 @@ class MainActivity : ComponentActivity() {
 
     fun jumpFromMainToChat(id: String) {
         ChatActivity.msg = msgMap[id]!!
+        ChatActivity.friend = getUserById(id)
         startActivity(Intent(this, ChatActivity::class.java))
     }
 

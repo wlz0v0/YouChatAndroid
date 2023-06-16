@@ -3,9 +3,9 @@ package edu.buptsse.youxuancheng.network
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.main.curUser
 import edu.buptsse.youchat.main.token
-import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.util.createFileIfNotExists
 import edu.buptsse.youchat.util.loginDataPath
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ private const val CHANGE_PWD_URL = "$USER_URL/changePassword"
 private const val SET_PWD_URL = "$USER_URL/setPassword"
 
 fun getUser(id: String): User {
-    return User(id, "伍昶旭", "", User.CUSTOMER)
+    return User(id, "伍昶旭", "")
 }
 
 /**
