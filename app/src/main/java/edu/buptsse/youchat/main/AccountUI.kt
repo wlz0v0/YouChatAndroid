@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import edu.buptsse.youchat.domain.User
 import java.util.regex.Pattern
 
-var curUser = User("10001", "wlz", "123456")
+var curUser = User("10001", "武连增", "123456")
 var token = ""
 val passwordPattern: Pattern = Pattern.compile("")
 val phoneNumberPattern: Pattern = Pattern.compile("")

@@ -4,15 +4,16 @@ package edu.buptsse.youchat.chat
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,12 +37,16 @@ import androidx.compose.ui.unit.sp
 import edu.buptsse.youchat.Message
 import edu.buptsse.youchat.R
 import edu.buptsse.youchat.domain.User
+import edu.buptsse.youchat.main.msgMap
 import edu.buptsse.youchat.ui.theme.Gray3
 import edu.buptsse.youchat.ui.theme.Teal200
 import edu.buptsse.youchat.ui.theme.YouChatTheme
+import edu.buptsse.youchat.util.FileUri
 import edu.buptsse.youchat.util.hasMicrophonePermission
 import edu.buptsse.youchat.util.hasReadAndWriteStoragePermission
+import edu.buptsse.youchat.util.getBitmapFromUri
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 class ChatActivity : ComponentActivity() {
@@ -48,6 +54,7 @@ class ChatActivity : ComponentActivity() {
         var msg = SnapshotStateList<Pair<Boolean, Message>>()
         var friend = User("10002", "伍昶旭", "")
         var i = 0
+        const val FRIEND_ID = "friend_id"
     }
 
     private lateinit var imageUri: Uri
@@ -79,25 +86,34 @@ class ChatActivity : ComponentActivity() {
         }
     }
 
+    private val maxHeight = 400
+    private val maxWidth = 200
     private val getImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             imageUri = uri
-            Log.e("image uri", uri.toString())
+            val bitmap = getBitmapFromUri(maxHeight, maxWidth, uri)
+            val outputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            val message = Message("武连增", friend.username, outputStream.toByteArray(), Date(), Message.Type.IMAGE)
+            msg.add(Pair(true, message))
+            msgMap[friend.id] = msg
         }
     }
 
     private val getFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             fileUri = uri
-            Log.e("image uri", uri.toString())
+            Log.e("file uri", uri.toString())
+            val path = FileUri.getFilePathByUri(this, uri)
+            path?.let { Log.e("file path", it) }
         }
     }
 
     private fun jumpFromChatToCall(friendId: String) {
+        CallActivity.friendId = friendId
         startActivity(Intent(this, CallActivity::class.java))
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -245,14 +261,26 @@ fun MessageBox(isSend: Boolean, message: Message) {
     val align = if (isSend) Alignment.End else Alignment.Start
     Column(Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 8.dp)) {
         Card(Modifier.background(Gray3).align(align), RoundedCornerShape(10)) {
-            Text(
-                message.text,
-                Modifier.background(bkgColor).align(Alignment.CenterHorizontally).padding(5.dp),
-                color = textColor,
-                fontSize = 22.sp
-            )
+            when (message.dataType) {
+                Message.Type.TEXT -> {
+                    Text(
+                        message.text,
+                        Modifier.background(bkgColor).align(Alignment.CenterHorizontally).padding(5.dp),
+                        color = textColor,
+                        fontSize = 22.sp
+                    )
+                }
+
+                Message.Type.IMAGE -> {
+                    val bitmap = BitmapFactory.decodeByteArray(message.data, 0, message.data.size)
+                    Image(bitmap.asImageBitmap(), null)
+                }
+
+                else -> throw RuntimeException()
+            }
         }
     }
+
 }
 
 @Composable

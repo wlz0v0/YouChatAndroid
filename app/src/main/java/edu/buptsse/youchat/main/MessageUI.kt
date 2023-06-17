@@ -34,7 +34,7 @@ val msgMap = mutableStateMapOf(
     "10002" to mutableStateListOf<Pair<Boolean, Message>>(
         Pair(
             false, Message(
-                "武连增", "伍昶旭",
+                curUser.id, "10002",
                 "This is a test".toByteArray(), Date(), Message.Type.TEXT
             )
         )
@@ -42,7 +42,7 @@ val msgMap = mutableStateMapOf(
     "10003" to mutableStateListOf<Pair<Boolean, Message>>(
         Pair(
             false, Message(
-                "武连增", "董浩楠",
+                curUser.id, "10003",
                 "This is a test".toByteArray(), Date(), Message.Type.TEXT
             )
         )
@@ -80,7 +80,14 @@ private fun MessageListView(friend: User, activity: MainActivity) {
         },
         secondaryText = {
             if (msgList.size != 0) {
-                Text(msgList.last().second.text, color = Gray5, fontSize = 19.sp)
+                val msg = msgList.last().second
+                val text = when (msg.dataType) {
+                    Message.Type.TEXT -> msg.text
+                    Message.Type.IMAGE -> "[图片]"
+                    Message.Type.FILE -> "[文件]"
+                    else -> ""
+                }
+                Text(text, color = Gray5, fontSize = 19.sp)
             }
         }
     ) {
