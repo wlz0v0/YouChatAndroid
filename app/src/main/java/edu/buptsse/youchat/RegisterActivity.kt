@@ -1,3 +1,4 @@
+package edu.buptsse.youchat/*
 package edu.buptsse.youchat
 
 import android.widget.Toast
@@ -26,64 +27,84 @@ import java.lang.Thread.sleep
 
 private const val reGetInterval = 90
 
+*/
 /**
  * 获取验证码倒计时的数字
- */
+ *//*
+
 private var verifyLeftNum = mutableStateOf(0)
 
+*/
 /**
  * 能否获取验证码
- */
+ *//*
+
 private var canGetVerification = mutableStateOf(verifyLeftNum.value == 0)
 
+*/
 /**
  * 验证码按钮文本
- */
+ *//*
+
 private var verifyButtonText = mutableStateOf("获取验证码")
 
+*/
 /**
  * 本Activity用于处理用户注册和找回密码，包括两个页面，
  * 第一页输入手机号和验证码，第二页输入密码和重复输入密码
- */
+ *//*
+
 @OptIn(ExperimentalAnimationApi::class)
 class RegisterActivity : TwoStepsActivity(), CoroutineScope by MainScope() {
     companion object {
-        /**
+        */
+/**
          * 当前是否是注册
          * true注册 false找回密码
-         */
+         *//*
+
         var isRegister = true
     }
 
-    /**
+    */
+/**
      * 以下三个字段用于记录用户输入结果
-     */
+     *//*
+
     private var phoneNumber = mutableStateOf("")
     private var verificationCode = mutableStateOf("")
     private var password = mutableStateOf("")
     private var rePassword = mutableStateOf("")
 
-    /**
+    */
+/**
      * 以下字段用于判断输入有效性
-     */
+     *//*
+
     private var isPhoneValid = mutableStateOf(false)
     private var isPasswordValid = mutableStateOf(false)
     private var isRePasswordValid = mutableStateOf(false)
 
-    /**
+    */
+/**
      * 是否展示正在注册中的Dialog
-     */
+     *//*
+
     private var dialogIsShow = mutableStateOf(false)
 
-    /**
+    */
+/**
      * password和rePassword的placeholder字符串中是否含有“新”，
      * 由是否是注册决定
-     */
+     *//*
+
     private val placeholderInsert: String
 
-    /**
+    */
+/**
      * 第二页提交账号和密码的按钮的文本
-     */
+     *//*
+
     private val buttonText: String
 
     init {
@@ -224,7 +245,9 @@ class RegisterActivity : TwoStepsActivity(), CoroutineScope by MainScope() {
                         }
                     }
                     val deferred = async {
-                        1/*if (isRegister) register(phoneNumber.value, password.value) else setPassword(password.value)*/
+                        1*/
+/*if (isRegister) register(phoneNumber.value, password.value) else setPassword(password.value)*//*
+
                     }
                     // 等待获取结果
                     when (deferred.await()) {
@@ -260,4 +283,4 @@ class RegisterActivity : TwoStepsActivity(), CoroutineScope by MainScope() {
             ProgressDialog("正在注册中···") { dialogIsShow.value = false }
         }
     }
-}
+}*/

@@ -5,11 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import edu.buptsse.youchat.LoginActivity
-import edu.buptsse.youchat.Message
-import edu.buptsse.youchat.util.communication.sendChatByTCP
+import edu.buptsse.youchat.service.CommunicationService
 import edu.buptsse.youchat.util.communication.transferInit
 import kotlinx.coroutines.*
-import java.util.*
+
 
 class StartActivity : ComponentActivity(), CoroutineScope by MainScope() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +18,7 @@ class StartActivity : ComponentActivity(), CoroutineScope by MainScope() {
             withContext(Dispatchers.IO) {
                 val res = async {
                     transferInit()
-                    sendChatByTCP(Message("简自豪", "喻文波", "我才是第一ADC".toByteArray(), Date(), Message.Type.TEXT))
+                    startService(Intent(this@StartActivity, CommunicationService::class.java))
                 }
                 res.await()
                 if (LoginActivity.loginState) {

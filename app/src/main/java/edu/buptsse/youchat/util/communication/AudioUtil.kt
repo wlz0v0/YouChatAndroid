@@ -1,13 +1,14 @@
 package edu.buptsse.youchat.util.communication
 
 import android.annotation.SuppressLint
-import android.media.AudioFormat
-import android.media.AudioManager
-import android.media.AudioRecord
-import android.media.AudioTrack
-import android.media.MediaRecorder
+import android.media.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.Socket
 
 private const val frequency = 44100
+
+@Suppress("DEPRECATION")
 private const val channelFormat = AudioFormat.CHANNEL_CONFIGURATION_MONO
 private const val audioEncoding = AudioFormat.ENCODING_PCM_16BIT
 
@@ -16,21 +17,30 @@ private lateinit var audioTrack: AudioTrack
 private val recordBufSize = AudioRecord.getMinBufferSize(frequency, channelFormat, audioEncoding) * 2
 private val playerBufSize = AudioTrack.getMinBufferSize(frequency, channelFormat, audioEncoding) * 2
 
-@Suppress("MissingPermission", "DEPRECATION")
+@Suppress("MissingPermission")
 fun audioInit() {
     audioRecorder = AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelFormat, audioEncoding, recordBufSize)
-    audioTrack = AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelFormat, audioEncoding, playerBufSize, AudioTrack.MODE_STREAM)
+    audioTrack = AudioTrack(
+        AudioManager.STREAM_MUSIC,
+        frequency,
+        channelFormat,
+        audioEncoding,
+        playerBufSize,
+        AudioTrack.MODE_STREAM
+    )
 }
 
 @SuppressLint("MissingPermission")
-suspend fun record() {
+suspend fun record(socket: Socket) {
     val buffer = ByteArray(recordBufSize)
     audioRecorder.startRecording()
     audioTrack.play()
-    while (true) {
-        val len = audioRecorder.read(buffer, 0, recordBufSize)
-        audioTrack.write(buffer, 0, len)
-        // TODO: 写给socket输出流
+    val outputStream = socket.getOutputStream()
+    withContext(Dispatchers.IO) {
+        while (true) {
+            val len = audioRecorder.read(buffer, 0, recordBufSize)
+            outputStream.write(buffer, 0, len)
+        }
     }
 }
 
@@ -39,16 +49,19 @@ fun audioStop() {
     audioTrack.stop()
 }
 
-suspend fun play() {
+@Suppress("DEPRECATION")
+suspend fun play(socket: Socket) {
     val bufSize = AudioTrack.getMinBufferSize(frequency, channelFormat, audioEncoding) * 2
-    @Suppress("DEPRECATION")
     val audioTrack =
         AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelFormat, audioEncoding, bufSize, AudioTrack.MODE_STREAM)
     val buffer = ByteArray(bufSize)
+    val inputStream = socket.getInputStream()
     audioTrack.play()
-    while (true) {
-        // TODO: 从socket读入流写给播放器
-        val len = 100
-        audioTrack.write(buffer, 0, len)
+    withContext(Dispatchers.IO) {
+        while (true) {
+            // TODO: 从socket读入流写给播放器
+            val len = inputStream.read(buffer, 0, bufSize)
+            audioTrack.write(buffer, 0, len)
+        }
     }
 }

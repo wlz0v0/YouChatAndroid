@@ -27,8 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.buptsse.youchat.ui.compose.*
-import edu.buptsse.youxuancheng.network.getNetworkType
-import edu.buptsse.youxuancheng.network.login
 import edu.buptsse.youxuancheng.ui.compose.*
 import kotlinx.coroutines.*
 import java.util.*
@@ -54,24 +52,25 @@ class LoginActivity : ComponentActivity(), CoroutineScope by MainScope() {
              saveLoginDate()
          }*/
     }
-
+    
     /**
      * 从LoginActivity跳转到RegisterActivity，注册账号
      */
-    fun jumpFromLoginToRegister() {
+    /*fun jumpFromLoginToRegister() {
         RegisterActivity.isRegister = true
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
     }
 
+    */
     /**
      * 从LoginActivity跳转到RegisterActivity，找回密码
-     */
+     *//*
     fun jumpFromLoginToFindPassword() {
         RegisterActivity.isRegister = false
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
-    }
+    }*/
 
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,7 +114,7 @@ class LoginActivity : ComponentActivity(), CoroutineScope by MainScope() {
                                     .show()
                                 return@RoundedCornerButton
                             }
-                            launch {
+                            /*launch {
                                 // 检查网络
                                 when (getNetworkType()) {
                                     2 -> Toast.makeText(this@LoginActivity, "正在使用移动数据", Toast.LENGTH_SHORT)
@@ -148,21 +147,21 @@ class LoginActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
                                         assert(false)
                                     }
-                                }
-                                // 完毕，关闭弹窗
-                                dialogIsShow = false
-                            }
-                            // 开启弹窗
-                            dialogIsShow = true
+                                }*/
+                            // 完毕，关闭弹窗
+                            dialogIsShow = false
                         }
-                        if (dialogIsShow) {
-                            ProgressDialog("正在登录中···") { dialogIsShow = false }
-                        }
+                        // 开启弹窗
+                        dialogIsShow = true
                     }
+                    /*if (dialogIsShow) {
+                            ProgressDialog("正在登录中···") { dialogIsShow = false }
+                        }*/
                 }
             }
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -192,7 +191,7 @@ fun RegisterAndFind(fatherActivity: LoginActivity) {
     ) {
         // 注册新账号按钮
         TextButton(
-            onClick = { fatherActivity.jumpFromLoginToRegister() },
+            onClick = { /*fatherActivity.jumpFromLoginToRegister()*/ },
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 // 对称分布在左侧
@@ -206,7 +205,7 @@ fun RegisterAndFind(fatherActivity: LoginActivity) {
         )
         // 找回密码按钮
         TextButton(
-            onClick = { fatherActivity.jumpFromLoginToFindPassword() },
+            onClick = { /*fatherActivity.jumpFromLoginToFindPassword()*/ },
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 // 对称分布在右侧

@@ -34,25 +34,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import edu.buptsse.youchat.Message
 import edu.buptsse.youchat.R
 import edu.buptsse.youchat.domain.User
+import edu.buptsse.youchat.main.curUser
 import edu.buptsse.youchat.main.msgMap
 import edu.buptsse.youchat.ui.theme.Gray3
 import edu.buptsse.youchat.ui.theme.Teal200
 import edu.buptsse.youchat.ui.theme.YouChatTheme
-import edu.buptsse.youchat.util.*
+import edu.buptsse.youchat.util.FileUri
+import edu.buptsse.youchat.util.communication.CALL_REQUEST
 import edu.buptsse.youchat.util.communication.audioInit
+import edu.buptsse.youchat.util.communication.sendCallReq
+import edu.buptsse.youchat.util.communication.sendMessage
+import edu.buptsse.youchat.util.getBitmapFromUri
+import edu.buptsse.youchat.util.hasMicrophonePermission
+import edu.buptsse.youchat.util.hasReadAndWriteStoragePermission
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.util.*
-import edu.buptsse.youchat.Message
 
-class ChatActivity : ComponentActivity() {
+class ChatActivity : ComponentActivity(), CoroutineScope by MainScope() {
     companion object {
         var msg = SnapshotStateList<Pair<Boolean, Message>>()
         var friend = User("10002", "伍昶旭", "")
         var i = 0
-        const val FRIEND_ID = "friend_id"
     }
 
     private lateinit var imageUri: Uri
@@ -147,6 +155,9 @@ class ChatActivity : ComponentActivity() {
                                         requestPermission.launch(audioPermission)
                                     } else {
                                         audioInit()
+                                        launch {
+                                            sendCallReq(friend.id, CALL_REQUEST)
+                                        }
                                         jumpFromChatToCall(friend.id)
                                     }
                                     scope.launch { drawerState.close() }
@@ -209,9 +220,15 @@ class ChatActivity : ComponentActivity() {
                             if (isSendButton) {
                                 Button(
                                     onClick = {
-                                        val message =
-                                            Message("wlz", "wcx", chatText.toByteArray(), Date(), Message.Type.TEXT)
-                                        msg.add(Pair(i % 2 == 0, message))
+                                        val message = Message(
+                                            curUser.id, friend.id,
+                                            chatText.toByteArray(),
+                                            Date(), Message.Type.TEXT
+                                        )
+                                        msg.add(Pair(true, message))
+                                        launch {
+                                            sendMessage(message)
+                                        }
                                         chatText = ""
                                         isSendButton = false
                                     }, modifier = Modifier.padding(10.dp, 5.dp).align(Alignment.CenterEnd).width(80.dp),
