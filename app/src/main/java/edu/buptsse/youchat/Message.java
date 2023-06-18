@@ -1,7 +1,9 @@
 package edu.buptsse.youchat;
 
-import java.io.Serializable;
+
+import java.io.*;
 import java.util.Date;
+
 
 @SuppressWarnings("unused")
 public class Message implements Serializable {
@@ -65,6 +67,31 @@ public class Message implements Serializable {
         return new String(data);
     }
 
+    public File saveImage() {
+        return null;
+    }
+
+    public File saveVideo() {
+        return null;
+    }
+
+    public File saveAudio() {
+        return null;
+    }
+
+    public File saveFile() {
+        return null;
+    }
+
+    private void saveData(File file) {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(data);
+            fos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public enum Type {
         TEXT,
         IMAGE,
@@ -73,6 +100,7 @@ public class Message implements Serializable {
         FILE,
         TCP_PORT_INFO,
         UDP_PORT_INFO,
-        CALL
+        CALL,
+        USER_SYSTEM         //data中的内容是由UserSystemMessage转字节而来
     }
 }

@@ -41,7 +41,7 @@ class LoginActivity : ComponentActivity(), CoroutineScope by MainScope() {
         /**
          * 登录状态，true为已登录
          */
-        var loginState = false
+        var loginState = true
 
         /**
          * 登录验证成功之后调用此函数登录

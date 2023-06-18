@@ -34,20 +34,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.buptsse.youchat.Message
 import edu.buptsse.youchat.R
 import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.main.msgMap
 import edu.buptsse.youchat.ui.theme.Gray3
 import edu.buptsse.youchat.ui.theme.Teal200
 import edu.buptsse.youchat.ui.theme.YouChatTheme
-import edu.buptsse.youchat.util.FileUri
-import edu.buptsse.youchat.util.hasMicrophonePermission
-import edu.buptsse.youchat.util.hasReadAndWriteStoragePermission
-import edu.buptsse.youchat.util.getBitmapFromUri
+import edu.buptsse.youchat.util.*
+import edu.buptsse.youchat.util.communication.audioInit
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.util.*
+import edu.buptsse.youchat.Message
 
 class ChatActivity : ComponentActivity() {
     companion object {
@@ -148,6 +146,7 @@ class ChatActivity : ComponentActivity() {
                                     if (!hasMicrophonePermission()) {
                                         requestPermission.launch(audioPermission)
                                     } else {
+                                        audioInit()
                                         jumpFromChatToCall(friend.id)
                                     }
                                     scope.launch { drawerState.close() }
