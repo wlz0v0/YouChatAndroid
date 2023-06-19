@@ -68,9 +68,10 @@ public class PortInfoUtil {
         }
 
 
+        DatagramSocket tcpClientReceiveSocket = null;
         Message tcpMsg = new Message(userId, userId, SerializeUtil.object2Bytes("port-info"), new Date(), Message.Type.TCP_PORT_INFO);
         try {
-            clientReceiveSocket = new DatagramSocket(tcpClientServerPort);
+            tcpClientReceiveSocket = new DatagramSocket(tcpClientServerPort);
             byte[] bytes = SerializeUtil.object2Bytes(tcpMsg);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, serverAddr, serverReceivePort);
 
@@ -78,8 +79,8 @@ public class PortInfoUtil {
             byte[] bytesReceived = new byte[1024];
             DatagramPacket packetReceived = new DatagramPacket(bytesReceived, bytesReceived.length);
 
-            clientReceiveSocket.send(packet);
-            clientReceiveSocket.receive(packetReceived);
+            tcpClientReceiveSocket.send(packet);
+            tcpClientReceiveSocket.receive(packetReceived);
 
             Message receiveMsg = (Message) SerializeUtil.bytes2Object(packetReceived.getData());
             // todo 考虑response的内容
@@ -88,6 +89,10 @@ public class PortInfoUtil {
         } catch (Exception e) {
             e.printStackTrace();
             ans.set(1, false);
+        } finally {
+            if (tcpClientReceiveSocket != null) {
+                tcpClientReceiveSocket.close();
+            }
         }
 
         //        try (Socket tcpSocket = new Socket(serverAddr, tcpClientServerPort)){
