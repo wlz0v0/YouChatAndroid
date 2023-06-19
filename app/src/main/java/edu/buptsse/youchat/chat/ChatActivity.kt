@@ -65,7 +65,7 @@ class ChatActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
     private lateinit var imageUri: Uri
     private lateinit var fileUri: Uri
-
+ 
     private val readPermission = Manifest.permission.READ_EXTERNAL_STORAGE
     private val writePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
     private val audioPermission = Manifest.permission.RECORD_AUDIO

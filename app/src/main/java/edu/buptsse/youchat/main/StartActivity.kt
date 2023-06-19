@@ -18,7 +18,7 @@ class StartActivity : ComponentActivity(), CoroutineScope by MainScope() {
             withContext(Dispatchers.IO) {
                 val res = async {
                     transferInit()
-                    startService(Intent(this@StartActivity, CommunicationService::class.java))
+                    startForegroundService(Intent(this@StartActivity, CommunicationService::class.java))
                 }
                 res.await()
                 if (LoginActivity.loginState) {
