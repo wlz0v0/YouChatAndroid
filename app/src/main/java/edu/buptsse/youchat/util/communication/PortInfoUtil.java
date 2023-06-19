@@ -40,7 +40,10 @@ public class PortInfoUtil {
         ans.add(false);
 
         Message udpMsg = new Message(userId, userId, SerializeUtil.object2Bytes("port-info"), new Date(), Message.Type.UDP_PORT_INFO);
-        try (DatagramSocket clientReceiveSocket = new DatagramSocket(clientReceivePort)) {
+        DatagramSocket clientReceiveSocket = null;
+        try {
+            clientReceiveSocket = new DatagramSocket(clientReceivePort);
+            clientReceiveSocket.setReuseAddress(true);
             byte[] bytes = SerializeUtil.object2Bytes(udpMsg);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, serverAddr, serverReceivePort);
 
@@ -58,11 +61,16 @@ public class PortInfoUtil {
         } catch (Exception e) {
             ans.set(0, false);
             e.printStackTrace();
+        } finally {
+            if (clientReceiveSocket != null) {
+                clientReceiveSocket.close();
+            }
         }
 
 
         Message tcpMsg = new Message(userId, userId, SerializeUtil.object2Bytes("port-info"), new Date(), Message.Type.TCP_PORT_INFO);
-        try (DatagramSocket clientReceiveSocket = new DatagramSocket(tcpClientServerPort)) {
+        try {
+            clientReceiveSocket = new DatagramSocket(tcpClientServerPort);
             byte[] bytes = SerializeUtil.object2Bytes(tcpMsg);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, serverAddr, serverReceivePort);
 
