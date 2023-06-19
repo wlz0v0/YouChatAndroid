@@ -1,5 +1,6 @@
 package edu.buptsse.youchat.util.communication
 
+import android.util.Log
 import edu.buptsse.youchat.Message
 import edu.buptsse.youchat.chat.CallActivity
 import edu.buptsse.youchat.main.curUser
@@ -48,6 +49,7 @@ suspend fun transferInit() {
             clientReceiveSocket = DatagramSocket(clientReceivePort)
             clientSendSocket = DatagramSocket(clientSendPort)
             chatTcpSocket = Socket(serverAddr, tcpChatServerPort)
+            PortInfoUtil.sendPortInfo(curUser.id)
 //        callTcpSocket = Socket(serverAddr, tcpCallServerPort)
 //        val oos1 = ObjectOutputStream(callTcpSocket!!.getOutputStream())
 //        oos1.writeObject(Message(curUser.id, curUser.id, null, Date(), Message.Type.CALL))
@@ -167,26 +169,31 @@ suspend fun receiveCall(service: CommunicationService) {
                     val ois = ObjectInputStream(callTcpSocket!!.getInputStream())
                     val msg = ois.readObject() as Message
                     if (msg.dataType == Message.Type.CALL) {
-                        val response = msg.text
-                        if (response == "acc") {
-                            if (callTcpSocket!!.isClosed) {
-                                callTcpSocket!!.connect(InetSocketAddress(serverAddr, tcpCallServerPort))
+                        when (val response = msg.text) {
+                            "acc" -> {
+                                if (callTcpSocket!!.isClosed) {
+                                    callTcpSocket!!.connect(InetSocketAddress(serverAddr, tcpCallServerPort))
+                                }
+                                CallActivity.isPickUp.value = true
+                                launch {
+                                    record(callTcpSocket!!)
+                                }
+                                launch {
+                                    play(callTcpSocket!!)
+                                }
+                                //                            new Thread(() -> AudioUtil.recordToSocket(callTcpSocket)).start();
+                                //                            AudioUtil.play(callTcpSocket);
                             }
-                            CallActivity.isPickUp.value = true
-                            launch {
-                                record(callTcpSocket!!)
+
+                            "req" -> {
+                                service.startCallActivity()
+                                //                            new Thread(() -> AudioUtil.recordToSocket(callTcpSocket)).start();
+                                //                            AudioUtil.play(callTcpSocket);
                             }
-                            launch {
-                                play(callTcpSocket!!)
+
+                            else -> {
+                                println(response)
                             }
-//                            new Thread(() -> AudioUtil.recordToSocket(callTcpSocket)).start();
-//                            AudioUtil.play(callTcpSocket);
-                        } else if (response == "req") {
-                            service.startCallActivity()
-//                            new Thread(() -> AudioUtil.recordToSocket(callTcpSocket)).start();
-//                            AudioUtil.play(callTcpSocket);
-                        } else {
-                            println(response)
                         }
                     }
                 } catch (e: EOFException) {
@@ -211,7 +218,13 @@ suspend fun receiveChatByTCP() {
                 try {
                     val ois = ObjectInputStream(chatTcpSocket!!.getInputStream())
                     val msg = ois.readObject() as Message
-                    msgMap[msg.to]?.add(Pair(false, msg))
+                    val list = msgMap[msg.from]
+                    if (list == null) Log.e("null", "list")
+                    list?.let {
+                        it.add(Pair(false, msg))
+                        msgMap[msg.from] = it
+                    }
+                    Log.e("msg", "${msg.from} ${msg.text}")
                 } catch (e: EOFException) {
                     //不做处理，进行下一次循环，直到出现新的传入
                 }

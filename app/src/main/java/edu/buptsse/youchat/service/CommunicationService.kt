@@ -1,6 +1,5 @@
 package edu.buptsse.youchat.service
 
-import android.app.Notification
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -22,7 +21,6 @@ class CommunicationService : Service(), CoroutineScope by MainScope() {
 
     override fun onCreate() {
         super.onCreate()
-        startForeground(1, Notification())
         launch {
             startReceiveMsg(this@CommunicationService)
         }

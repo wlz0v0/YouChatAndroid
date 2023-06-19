@@ -18,7 +18,6 @@ class StartActivity : ComponentActivity(), CoroutineScope by MainScope() {
             withContext(Dispatchers.IO) {
                 val res = async {
                     transferInit()
-                    startForegroundService(Intent(this@StartActivity, CommunicationService::class.java))
                 }
                 res.await()
                 if (LoginActivity.loginState) {
@@ -29,5 +28,10 @@ class StartActivity : ComponentActivity(), CoroutineScope by MainScope() {
                 finish()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startService(Intent(this, CommunicationService::class.java))
     }
 }
