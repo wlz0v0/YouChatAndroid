@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import edu.buptsse.youchat.LoginActivity
 import edu.buptsse.youchat.service.CommunicationService
 import edu.buptsse.youchat.util.communication.transferInit
@@ -24,6 +25,9 @@ class StartActivity : ComponentActivity(), CoroutineScope by MainScope() {
                     startActivity(Intent(this@StartActivity, MainActivity::class.java))
                 } else {
                     startActivity(Intent(this@StartActivity, LoginActivity::class.java))
+                }
+                friendList.forEach {
+                    msgMap[it.id] = SnapshotStateList()
                 }
                 finish()
             }

@@ -12,8 +12,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,8 +30,8 @@ import java.util.*
 /**
  * key是好友的id，value是和好友的聊天消息
  */
-val msgMap = mutableStateMapOf(
-    "10002" to mutableStateListOf<Pair<Boolean, Message>>(
+val msgMap = mutableStateMapOf<String, SnapshotStateList<Pair<Boolean, Message>>>(
+    /*"10002" to mutableStateListOf<Pair<Boolean, Message>>(
         Pair(
             false, Message(
                 curUser.id, "10002",
@@ -46,7 +46,7 @@ val msgMap = mutableStateMapOf(
                 "This is a test".toByteArray(), Date(), Message.Type.TEXT
             )
         )
-    )
+    )*/
 )
 
 @Composable

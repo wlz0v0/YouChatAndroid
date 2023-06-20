@@ -59,13 +59,13 @@ import java.util.*
 class ChatActivity : ComponentActivity(), CoroutineScope by MainScope() {
     companion object {
         var msg = SnapshotStateList<Pair<Boolean, Message>>()
-        var friend = User("10002", "伍昶旭", "")
+        lateinit var friend: User
         var i = 0
     }
 
     private lateinit var imageUri: Uri
     private lateinit var fileUri: Uri
- 
+
     private val readPermission = Manifest.permission.READ_EXTERNAL_STORAGE
     private val writePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
     private val audioPermission = Manifest.permission.RECORD_AUDIO
