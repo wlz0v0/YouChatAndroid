@@ -10,9 +10,12 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class CommunicationService : Service(), CoroutineScope by MainScope() {
-    fun startCallActivity() {
+    fun startCallActivity(friendId: String) {
         CallActivity.isReceiver.value = true
-        startActivity(Intent(this, CallActivity::class.java))
+        CallActivity.friendId = friendId
+        val intent = Intent(this, CallActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 
     override fun onBind(p0: Intent?): IBinder? {

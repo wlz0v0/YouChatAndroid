@@ -44,7 +44,6 @@ import edu.buptsse.youchat.ui.theme.Teal200
 import edu.buptsse.youchat.ui.theme.YouChatTheme
 import edu.buptsse.youchat.util.FileUri
 import edu.buptsse.youchat.util.communication.CALL_REQUEST
-import edu.buptsse.youchat.util.communication.audioInit
 import edu.buptsse.youchat.util.communication.sendCallReq
 import edu.buptsse.youchat.util.communication.sendMessage
 import edu.buptsse.youchat.util.getBitmapFromUri
@@ -117,6 +116,7 @@ class ChatActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
     private fun jumpFromChatToCall(friendId: String) {
         CallActivity.friendId = friendId
+        CallActivity.isReceiver.value = false
         startActivity(Intent(this, CallActivity::class.java))
     }
 
@@ -154,7 +154,6 @@ class ChatActivity : ComponentActivity(), CoroutineScope by MainScope() {
                                     if (!hasMicrophonePermission()) {
                                         requestPermission.launch(audioPermission)
                                     } else {
-                                        audioInit()
                                         launch {
                                             sendCallReq(friend.id, CALL_REQUEST)
                                         }

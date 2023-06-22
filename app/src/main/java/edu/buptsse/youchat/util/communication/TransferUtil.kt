@@ -46,14 +46,15 @@ suspend fun transferInit() {
         try {
             serverAddr = InetAddress.getByName("119.3.224.100")
             //            serverAddr = InetAddress.getByName("127.0.0.1");
-            clientReceiveSocket = DatagramSocket(clientReceivePort)
-            clientSendSocket = DatagramSocket(clientSendPort)
+            //clientReceiveSocket = DatagramSocket(clientReceivePort)
+            //clientSendSocket = DatagramSocket(clientSendPort)
             chatTcpSocket = Socket(serverAddr, tcpChatServerPort)
             PortInfoUtil.sendPortInfo(curUser.id)
-//        callTcpSocket = Socket(serverAddr, tcpCallServerPort)
-//        val oos1 = ObjectOutputStream(callTcpSocket!!.getOutputStream())
-//        oos1.writeObject(Message(curUser.id, curUser.id, null, Date(), Message.Type.CALL))
-//        oos1.flush()
+            callTcpSocket = Socket(serverAddr, tcpCallServerPort)
+            val oos1 = ObjectOutputStream(callTcpSocket!!.getOutputStream())
+            oos1.writeObject(Message(curUser.id, curUser.id, null, Date(), Message.Type.CALL))
+            oos1.flush()
+            Log.e("socket", callTcpSocket.toString())
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -168,6 +169,7 @@ suspend fun receiveCall(service: CommunicationService) {
                 try {
                     val ois = ObjectInputStream(callTcpSocket!!.getInputStream())
                     val msg = ois.readObject() as Message
+                    Log.e("call", "${msg.from}: ${msg.text}")
                     if (msg.dataType == Message.Type.CALL) {
                         when (val response = msg.text) {
                             "acc" -> {
@@ -175,6 +177,7 @@ suspend fun receiveCall(service: CommunicationService) {
                                     callTcpSocket!!.connect(InetSocketAddress(serverAddr, tcpCallServerPort))
                                 }
                                 CallActivity.isPickUp.value = true
+                                Log.e("call", "accepted")
                                 launch {
                                     record(callTcpSocket!!)
                                 }
@@ -186,7 +189,8 @@ suspend fun receiveCall(service: CommunicationService) {
                             }
 
                             "req" -> {
-                                service.startCallActivity()
+                                Log.e("req", "收到请求")
+                                service.startCallActivity(msg.from)
                                 //                            new Thread(() -> AudioUtil.recordToSocket(callTcpSocket)).start();
                                 //                            AudioUtil.play(callTcpSocket);
                             }
