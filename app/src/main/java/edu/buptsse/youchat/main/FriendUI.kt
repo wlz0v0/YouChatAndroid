@@ -22,13 +22,14 @@ import androidx.compose.ui.unit.sp
 import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.ui.theme.Gray5
 import edu.buptsse.youchat.ui.theme.Teal200
+import edu.buptsse.youchat.util.UserConfig
 
 /**
  * key是好友的id，value是和好友的聊天消息
  */
 val friendList = mutableStateListOf<User>(
-    User("10002", "伍昶旭", ""),
-    User("10003", "董浩楠", "")
+    UserConfig.wcx,
+    UserConfig.dhn
 )
 
 fun getUserById(id: String): User {
