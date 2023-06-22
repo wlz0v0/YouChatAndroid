@@ -47,6 +47,7 @@ suspend fun record(socket: Socket) {
 fun audioStop() {
     audioRecorder.stop()
     audioTrack.stop()
+    callTcpSocket?.close()
 }
 
 @Suppress("DEPRECATION")

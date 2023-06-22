@@ -1,11 +1,10 @@
 package chat;
 
-import chat.msg.Message;
+import edu.buptsse.youchat.Message;
 import chat.util.SerializeUtil;
 import chat.util.TransferUtil;
 import user.UserSystemHandler;
 import user.UserSystemMessage;
-import user.UserSystemRunner;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -70,6 +69,7 @@ public class ChatRunner {
         while (true) {
             Socket socket = ss.accept();
             executors.execute(() -> {
+                boolean isCatched = false;
                 while (true) {
                     try {
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
@@ -85,14 +85,14 @@ public class ChatRunner {
                                     SerializeUtil.object2Bytes(UserSystemHandler.handle((UserSystemMessage) Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData())))),
                                     msg.getTime(), Message.Type.USER_SYSTEM);
                             TransferUtil.sendByTCP(socket, respondMsg);
-                            if(UserSystemMessage.UserSystemMessageType.FRIEND_APPLICATION==((UserSystemMessage)Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData()))).type){
-                                TransferUtil.sendByTCP(toSocket,msg);
+                            if (UserSystemMessage.UserSystemMessageType.FRIEND_APPLICATION == ((UserSystemMessage) Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData()))).type) {
+                                TransferUtil.sendByTCP(toSocket, msg);
                             }
-                            if(UserSystemMessage.UserSystemMessageType.FRIEND_APPLICATION_RESPOND==((UserSystemMessage)Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData()))).type){
-                                TransferUtil.sendByTCP(toSocket,msg);
+                            if (UserSystemMessage.UserSystemMessageType.FRIEND_APPLICATION_RESPOND == ((UserSystemMessage) Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData()))).type) {
+                                TransferUtil.sendByTCP(toSocket, msg);
                             }
-                            if(UserSystemMessage.UserSystemMessageType.DELETE_FRIEND==((UserSystemMessage)Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData()))).type){
-                                TransferUtil.sendByTCP(toSocket,msg);
+                            if (UserSystemMessage.UserSystemMessageType.DELETE_FRIEND == ((UserSystemMessage) Objects.requireNonNull(SerializeUtil.bytes2Object(msg.getData()))).type) {
+                                TransferUtil.sendByTCP(toSocket, msg);
                             }
                         }
                         if (null == toSocket) {
@@ -105,7 +105,10 @@ public class ChatRunner {
 
                         }
                     } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
+                        if (!isCatched) {
+                            isCatched = true;
+                            e.printStackTrace();
+                        } else break;
                     }
                     //socket不关闭
                 }
@@ -133,24 +136,32 @@ public class ChatRunner {
 
     public static void callRun() throws IOException {
         while (true) {
+            System.out.println("call: waiting for accept...\n");
             Socket socket = callSS.accept();
             executors.execute(() -> {
-                try {
-                    while (true) {
+                boolean isCatched = false;
+                System.out.println("call: accept\n");
+                while (true) {
+                    try {
+                        System.out.println("call: 1\n");
                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                         Message msg = (Message) ois.readObject();
                         callSocketMap.put(msg.getFrom(), socket);
-
+                        System.out.println("call: 2\n");
                         if (msg.getTo().equals(msg.getFrom())) {
                             System.out.println(msg.getFrom() + " has connected to call server");
                         } else {
                             Socket toSocket = callSocketMap.get(msg.getTo());
+                            System.out.println("call: 3\n");
                             if (null == toSocket) {
                                 System.out.println(msg.getTo() + " has not connected to call server. call failed.");
                             } else {
                                 ObjectOutputStream oos1 = new ObjectOutputStream(toSocket.getOutputStream());
                                 oos1.writeObject(msg);
                                 oos1.flush();
+                                System.out.println("call: 已转发 from: " + msg.getFrom() + " to:" + msg.getTo() + "\n");
+//                                if (msg.getText().equals("req")){
+//                                }
                                 if (msg.getText().equals("acc")) {
                                     executors.execute(() -> writeFromRead(toSocket, socket));
                                     writeFromRead(socket, toSocket);
@@ -158,9 +169,12 @@ public class ChatRunner {
                             }
                             //socket不关闭
                         }
+                    } catch (IOException | ClassNotFoundException e) {
+                        if (!isCatched) {
+                            isCatched = true;
+                            e.printStackTrace();
+                        } else break;
                     }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
                 }
             });
         }

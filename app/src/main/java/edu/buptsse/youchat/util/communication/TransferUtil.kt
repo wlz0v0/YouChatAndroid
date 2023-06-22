@@ -39,7 +39,7 @@ private var serverAddr: InetAddress? = null
 private var clientSendSocket: DatagramSocket? = null //负责向服务端发送消息并接受回复
 private var clientReceiveSocket: DatagramSocket? = null //接受服务器主动发送的消息
 private var chatTcpSocket: Socket? = null
-private var callTcpSocket: Socket? = null
+var callTcpSocket: Socket? = null
 
 suspend fun transferInit() {
     withContext(Dispatchers.IO) {
@@ -134,6 +134,9 @@ suspend fun sendChatByTCP(message: Message?) {
         try {
             if (chatTcpSocket!!.isClosed) {
                 chatTcpSocket!!.connect(InetSocketAddress(serverAddr, tcpChatServerPort))
+                val oos1 = ObjectOutputStream(callTcpSocket!!.getOutputStream())
+                oos1.writeObject(Message(curUser.id, curUser.id, null, Date(), Message.Type.CALL))
+                oos1.flush()
             }
             val oos = ObjectOutputStream(chatTcpSocket!!.getOutputStream())
             oos.writeObject(message)
@@ -149,6 +152,9 @@ suspend fun sendCallReq(to: String, info: String) {
         try {
             if (callTcpSocket!!.isClosed) {
                 callTcpSocket!!.connect(InetSocketAddress(serverAddr, tcpCallServerPort))
+                val oos1 = ObjectOutputStream(callTcpSocket!!.getOutputStream())
+                oos1.writeObject(Message(curUser.id, curUser.id, null, Date(), Message.Type.CALL))
+                oos1.flush()
             }
             val oos = ObjectOutputStream(callTcpSocket!!.getOutputStream())
             oos.writeObject(Message(curUser.id, to, info.toByteArray(), Date(), Message.Type.CALL))
@@ -164,6 +170,9 @@ suspend fun receiveCall(service: CommunicationService) {
         try {
             if (callTcpSocket!!.isClosed) {
                 callTcpSocket!!.connect(InetSocketAddress(serverAddr, tcpCallServerPort))
+                val oos1 = ObjectOutputStream(callTcpSocket!!.getOutputStream())
+                oos1.writeObject(Message(curUser.id, curUser.id, null, Date(), Message.Type.CALL))
+                oos1.flush()
             }
             while (true) {
                 try {
