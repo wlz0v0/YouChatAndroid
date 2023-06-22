@@ -16,7 +16,7 @@ import edu.buptsse.youchat.ui.theme.Gray5
 import edu.buptsse.youchat.util.UserConfig
 import java.util.regex.Pattern
 
-var curUser = UserConfig.wlz
+var curUser = UserConfig.wcx
 var token = ""
 val passwordPattern: Pattern = Pattern.compile("")
 val phoneNumberPattern: Pattern = Pattern.compile("")

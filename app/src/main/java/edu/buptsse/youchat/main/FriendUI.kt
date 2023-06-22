@@ -28,7 +28,7 @@ import edu.buptsse.youchat.util.UserConfig
  * key是好友的id，value是和好友的聊天消息
  */
 val friendList = mutableStateListOf<User>(
-    UserConfig.wcx,
+    UserConfig.wlz,
     UserConfig.dhn
 )
 
