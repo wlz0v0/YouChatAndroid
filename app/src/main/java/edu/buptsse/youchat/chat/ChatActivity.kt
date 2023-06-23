@@ -100,6 +100,9 @@ class ChatActivity : ComponentActivity(), CoroutineScope by MainScope() {
             val outputStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
             val message = Message("武连增", friend.username, outputStream.toByteArray(), Date(), Message.Type.IMAGE)
+            launch {
+                sendMessage(message)
+            }
             msg.add(Pair(true, message))
             msgMap[friend.id] = msg
         }

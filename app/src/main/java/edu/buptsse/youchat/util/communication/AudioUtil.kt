@@ -17,7 +17,7 @@ private lateinit var audioTrack: AudioTrack
 private val recordBufSize = AudioRecord.getMinBufferSize(frequency, channelFormat, audioEncoding) * 2
 private val playerBufSize = AudioTrack.getMinBufferSize(frequency, channelFormat, audioEncoding) * 2
 
-@Suppress("MissingPermission")
+@Suppress("MissingPermission", "Deprecation")
 fun audioInit() {
     audioRecorder = AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelFormat, audioEncoding, recordBufSize)
     audioTrack = AudioTrack(
@@ -34,7 +34,6 @@ fun audioInit() {
 suspend fun record(socket: Socket) {
     val buffer = ByteArray(recordBufSize)
     audioRecorder.startRecording()
-    audioTrack.play()
     val outputStream = socket.getOutputStream()
     withContext(Dispatchers.IO) {
         while (true) {
@@ -50,11 +49,8 @@ fun audioStop() {
     callTcpSocket?.close()
 }
 
-@Suppress("DEPRECATION")
 suspend fun play(socket: Socket) {
-    val bufSize = AudioTrack.getMinBufferSize(frequency, channelFormat, audioEncoding) * 2
-    val audioTrack =
-        AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelFormat, audioEncoding, bufSize, AudioTrack.MODE_STREAM)
+    val bufSize = AudioTrack.getMinBufferSize(frequency, channelFormat, audioEncoding) * 4
     val buffer = ByteArray(bufSize)
     val inputStream = socket.getInputStream()
     audioTrack.play()
