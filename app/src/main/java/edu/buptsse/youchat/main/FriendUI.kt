@@ -3,14 +3,9 @@ package edu.buptsse.youchat.main
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
+import androidx.compose.material.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -81,6 +76,22 @@ fun FriendUI(activity: MainActivity) {
         // TODO: bottom padding
         LazyColumn(Modifier.fillMaxWidth().padding(bottom = 0.dp)) {
             item { FriendListView(activity) }
+        }
+        Row {
+            TextButton(
+                onClick = {
+
+                },
+//                Modifier.align(Alignment.Start).padding(top = 15.dp)
+            ) {
+                Text("添加好友", color = Color.Black, fontSize = 23.sp, fontWeight = FontWeight.Bold)
+            }
+            TextButton(
+                onClick = {  },
+//                Modifier.align(Alignment.End).padding(top = 15.dp)
+            ) {
+                Text("新的好友", color = Color.Black, fontSize = 23.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }

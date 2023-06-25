@@ -1,5 +1,6 @@
-package chat.msg;
+package edu.buptsse.youchat;
 
+import chat.msg.FileMessageData;
 import chat.util.SerializeUtil;
 
 import java.io.*;

@@ -1,7 +1,7 @@
 package chat.util;
 
 import chat.ChatRunner;
-import chat.msg.Message;
+import edu.buptsse.youchat.Message;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
