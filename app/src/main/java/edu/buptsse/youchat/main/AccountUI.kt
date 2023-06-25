@@ -20,7 +20,7 @@ import edu.buptsse.youchat.ui.theme.Gray5
 import edu.buptsse.youchat.util.UserConfig
 import java.util.regex.Pattern
 
-var curUser = UserConfig.wcx
+var curUser:edu.buptsse.youchat.domain.User = UserConfig.nobody
 var token = ""
 val passwordPattern: Pattern = Pattern.compile("")
 val phoneNumberPattern: Pattern = Pattern.compile("")
@@ -30,7 +30,13 @@ fun AccountUI(activity: MainActivity, navController: NavController) {
     Column(Modifier.fillMaxWidth()) {
         Card(Modifier.fillMaxWidth().height(100.dp), backgroundColor = Color.White) {
             Box(Modifier.padding(10.dp).background(Color.White)) {
-                Column(Modifier.align(Alignment.CenterStart)) {
+                Column(
+                    Modifier.align(Alignment.CenterStart).clickable {
+                        if (curUser == UserConfig.nobody){
+                            activity.jumpFromMainToLogin()
+                        }
+                    }
+                ) {
                     Text(
                         curUser.username,
                         fontSize = 25.sp,

@@ -1,6 +1,9 @@
-package edu.buptsse.youchat.user;
+package edu.buptsse.youchat;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
+    private static final long serialVersionUID = 500384L;
     public User(String id, String name, String password) {
         this.id = id;
         this.name = name;

@@ -1,5 +1,6 @@
 package edu.buptsse.youchat.main
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,24 +14,52 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import edu.buptsse.youchat.Message
+import edu.buptsse.youchat.UserSystemMessage
 import edu.buptsse.youchat.domain.User
 import edu.buptsse.youchat.ui.theme.Gray5
 import edu.buptsse.youchat.ui.theme.Teal200
-import edu.buptsse.youchat.util.UserConfig
+import edu.buptsse.youchat.util.communication.SerializeUtil
+import edu.buptsse.youchat.util.communication.sendChatByTCP
+import edu.buptsse.youchat.util.communication.usmQueue
+import kotlinx.coroutines.async
+import java.util.*
 
 /**
  * key是好友的id，value是和好友的聊天消息
  */
-val friendList = mutableStateListOf<User>(
-    UserConfig.wlz,
-    UserConfig.dhn
-)
+val friendList = mutableStateListOf<User>()
+
+suspend fun getFriendList() {
+    Log.d("getFriendList", "start")
+
+    var usm: UserSystemMessage = UserSystemMessage()
+    usm.id = curUser.id
+    usm.type = UserSystemMessage.UserSystemMessageType.GET_FRIEND_LIST
+    val msg = Message(curUser.id, curUser.id, SerializeUtil.object2Bytes(usm), Date(), Message.Type.USER_SYSTEM)
+    sendChatByTCP(msg)
+    Log.d("getFriendList", "waiting")
+    usm = usmQueue.take()
+    Log.d("getFriendList", "waited")
+    for (friend in usm.friendList) {
+        friendList.add(User(friend.id, friend.name, ""))
+        msgMap[friend.id] = mutableStateListOf<Pair<Boolean, Message>>(
+//            Pair(
+//                false, Message(
+//                    curUser.id, friend.id,
+//                    "This is a test".toByteArray(), Date(), Message.Type.TEXT
+//                )
+//            )
+        )
+    }
+}
 
 fun getUserById(id: String): User {
     return friendList.stream().filter { it.id == id }.findFirst().get()

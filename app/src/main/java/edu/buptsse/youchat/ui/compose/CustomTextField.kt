@@ -148,6 +148,27 @@ fun ColumnScope.NameTextField(name: String, onValueChange: (String) -> Unit) {
     )
 }
 
+
+@Composable
+fun ColumnScope.IDTextField(id: String, onValueChange: (String) -> Unit) {
+    TextField(
+        value = id,
+        onValueChange = { onValueChange(it) },
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        leadingIcon = {
+            Icon(
+                painterResource(R.drawable.ic_baseline_person_24),
+                contentDescription = null
+            )
+        },
+        placeholder = { Text("请输入ID", color = MaterialTheme.colors.onBackground) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        // 背景色设为白色
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+    )
+}
+
 /*
 @Composable
 fun ColumnScope.EmailTextField(email: String, onValueChange: (String) -> Unit) {

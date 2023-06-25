@@ -1,7 +1,9 @@
 package edu.buptsse.youchat.util.communication
 
 import android.util.Log
+import edu.buptsse.youchat.LoginActivity
 import edu.buptsse.youchat.Message
+import edu.buptsse.youchat.UserSystemMessage
 import edu.buptsse.youchat.chat.CallActivity
 import edu.buptsse.youchat.main.curUser
 import edu.buptsse.youchat.main.msgMap
@@ -16,6 +18,7 @@ import java.io.ObjectOutputStream
 import java.net.*
 import java.nio.charset.StandardCharsets
 import java.util.*
+import java.util.concurrent.LinkedBlockingQueue
 
 
 private const val serverReceivePort = 8080
@@ -41,6 +44,8 @@ private var clientReceiveSocket: DatagramSocket? = null //接受服务器主动�
 private var chatTcpSocket: Socket? = null
 var callTcpSocket: Socket? = null
 
+public val usmQueue = LinkedBlockingQueue<UserSystemMessage>(10)
+
 suspend fun transferInit() {
     withContext(Dispatchers.IO) {
         try {
@@ -59,6 +64,12 @@ suspend fun transferInit() {
             e.printStackTrace()
         }
     }
+}
+
+suspend fun transferRestart(){
+    chatTcpSocket?.close()
+    callTcpSocket?.close()
+    transferInit()
 }
 
 suspend fun connectCallServer() {
@@ -233,6 +244,10 @@ suspend fun receiveChatByTCP() {
                     val msg = ois.readObject() as Message
                     val list = msgMap[msg.from]
                     if (list == null) Log.e("null", "list")
+                    Log.d("receive",(msg.dataType==Message.Type.USER_SYSTEM).toString())
+                    if (msg.dataType==Message.Type.USER_SYSTEM){
+                        usmQueue.put(SerializeUtil.bytes2Object(msg.data) as UserSystemMessage?)
+                    }
                     list?.let {
                         it.add(Pair(false, msg))
                         msgMap[msg.from] = it

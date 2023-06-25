@@ -1,7 +1,5 @@
 package edu.buptsse.youchat;
 
-import edu.buptsse.youchat.user.User;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,7 +12,7 @@ public class UserSystemMessage  implements Serializable  {
     public String targetId;
     public Boolean isAccept;
     public int respondState;
-    public List<User> FriendList;
+    public List<User> friendList;
 
 
     //所有的返回消息都包含respondState字段
